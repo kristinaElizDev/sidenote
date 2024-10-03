@@ -6,6 +6,10 @@ node_modules
 *.a
 *.so
 
+#Node
+package-lock.json
+package.json
+
 #Folders
 _obj
 _test
