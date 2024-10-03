@@ -1,26 +1,26 @@
-import { Flex, Input, Button, Spinner } from "@chakra-ui/react";
+import { Flex, Textarea, Button, Spinner } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { BASE_URL } from "../App";
 
-const TodoForm = () => {
-    const [newTodo, setNewTodo] = useState("");
+const NoteForm = () => {
+    const [newNote, setNewNote] = useState("");
     const [isPending, setIsPending] = useState(false);
     
     const queryClient = useQueryClient(); 
 
-    const {mutate:createTodo,isPending:isCreating}=useMutation({
-        mutationKey:['createTodo'],
+    const {mutate:createNote,isPending:isCreating}=useMutation({
+        mutationKey:['createNote'],
         mutationFn:async(e:React.FormEvent)=> {
             e.preventDefault()
             try {
-                const res = await fetch(BASE_URL + `/todos`, {
+                const res = await fetch(BASE_URL + `/notes`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ body: newTodo }),
+                    body: JSON.stringify({ body: newNote }),
                 })
                 const data = await res.json()
 
@@ -28,7 +28,7 @@ const TodoForm = () => {
                     throw new  Error(data.error || "Something went wrong");
                 }
 
-                setNewTodo("");
+                setNewNote("");
                 return data;
 
             } catch (error: any) {
@@ -36,7 +36,7 @@ const TodoForm = () => {
             }
         }, 
         onSuccess: () => { 
-            queryClient.invalidateQueries({queryKey: ["todos"]});
+            queryClient.invalidateQueries({queryKey: ["notes"]});
         },
         onError: (error: any) => {
             alert(error.message);
@@ -44,13 +44,12 @@ const TodoForm = () => {
     });
 
     return (
-        <form onSubmit={createTodo}>
+        <form onSubmit={createNote}>
             <Flex gap={2}>
-                <Input
-                    type='text'
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    ref={(input) => input && input.focus()}
+                <Textarea
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    size='sm'
                 />
                 <Button
                     mx={2}
@@ -65,4 +64,4 @@ const TodoForm = () => {
         </form>
     );
 };
-export default TodoForm
+export default NoteForm

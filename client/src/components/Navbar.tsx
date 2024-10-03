@@ -1,6 +1,7 @@
 import { Box, Container, Flex, useColorMode, Text, Button, useColorModeValue } from "@chakra-ui/react";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
+import NewNoteForm from "./NewNoteForm";
 
 
 export default function Navbar() {
@@ -17,17 +18,14 @@ export default function Navbar() {
                         gap={3}
                         display={{ base: "none", sm: "flex"}}
                     >
-                        <img src='/react.png' alt='logo' width={50} height={50} />
-                        <Text fontSize={"40"}>+</Text>
-                        <img src='/go.png' alt='logo' width={40} height={40} />
-                        <Text fontSize={"40"}>=</Text>
-                        <img src='/explode.png' alt='logo' width={50} height={50} />
+                        Sidenote.
+                        <NewNoteForm/>
+
                     </Flex>
 
                     {/* RIGHT SIDE */}
                     <Flex alignItems={"center"} gap={3}>
                         <Text fontSize={"lg"} fontWeight={500}>
-                            Daily Tasks
                         </Text>
                         {/* Toggle Color Mode */}
                         <Button onClick={toggleColorMode}>

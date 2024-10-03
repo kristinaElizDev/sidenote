@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -21,7 +22,14 @@ type Todo struct {
 	Body      string             `json:"body"`
 }
 
+type Note struct {
+	ID   primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Date time.Time          `json:"date"`
+	Body string             `json:"body"`
+}
+
 var collection *mongo.Collection
+var notesCollection *mongo.Collection
 
 func main() {
 	fmt.Println("Hello world!!")
@@ -50,6 +58,7 @@ func main() {
 	fmt.Println("Connected to MongoDB")
 
 	collection = client.Database("sidenote").Collection("todos")
+	notesCollection = client.Database("sidenote").Collection("notes")
 
 	app := fiber.New()
 
@@ -58,10 +67,17 @@ func main() {
 		AllowHeaders: "Origin,Content-Type,Accept",
 	}))
 
+	//Demo todo endpoints, can be removed eventually.
 	app.Get("/api/todos", getTodos)
 	app.Post("/api/todos", createTodo)
 	app.Put("/api/todos/:id", updateTodo)
 	app.Delete("/api/todos/:id", deleteTodo)
+
+	//Note endpoints
+	app.Get("/api/notes", getNotes)
+	app.Post("/api/notes", createNote)
+	app.Put("/api/notes/:id", updateNote)
+	app.Delete("/api/notes/:id", deleteNote)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -94,6 +110,28 @@ func getTodos(c *fiber.Ctx) error {
 
 }
 
+func getNotes(c *fiber.Ctx) error {
+	var notes []Note
+	cursor, err := notesCollection.Find(context.Background(), bson.M{})
+
+	if err != nil {
+		return err
+	}
+
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var note Note
+		if err := cursor.Decode(&note); err != nil {
+			return err
+		}
+		notes = append(notes, note)
+	}
+
+	return c.JSON(notes)
+
+}
+
 func createTodo(c *fiber.Ctx) error {
 	todo := new(Todo)
 
@@ -113,6 +151,28 @@ func createTodo(c *fiber.Ctx) error {
 	todo.ID = insertResult.InsertedID.(primitive.ObjectID)
 
 	return c.Status(201).JSON(todo)
+}
+
+func createNote(c *fiber.Ctx) error {
+	note := new(Note)
+	note.Date = time.Now()
+
+	if err := c.BodyParser(note); err != nil {
+		return err
+	}
+
+	if note.Body == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "note body cannot be empty"})
+	}
+
+	insertResult, err := notesCollection.InsertOne(context.Background(), note)
+	if err != nil {
+		return err
+	}
+
+	note.ID = insertResult.InsertedID.(primitive.ObjectID)
+
+	return c.Status(201).JSON(note)
 }
 
 func updateTodo(c *fiber.Ctx) error {
@@ -137,6 +197,29 @@ func updateTodo(c *fiber.Ctx) error {
 
 }
 
+func updateNote(c *fiber.Ctx) error {
+	id := c.Params("id")
+	body := c.Params("body")
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid note ID"})
+
+	}
+
+	filter := bson.M{"_id": ObjectID}
+	update := bson.M{"$set": bson.M{"body": body}}
+
+	_, err = notesCollection.UpdateOne(context.Background(), filter, update)
+
+	if err != nil {
+		return err
+	}
+
+	return c.Status(201).JSON(fiber.Map{"Success": "true"})
+
+}
+
 func deleteTodo(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ObjectID, err := primitive.ObjectIDFromHex(id)
@@ -148,6 +231,26 @@ func deleteTodo(c *fiber.Ctx) error {
 
 	filter := bson.M{"_id": ObjectID}
 	_, err = collection.DeleteOne(context.Background(), filter)
+
+	if err != nil {
+		return err
+	}
+
+	return c.Status(201).JSON(fiber.Map{"Success": "true"})
+
+}
+
+func deleteNote(c *fiber.Ctx) error {
+	id := c.Params("id")
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid note ID"})
+
+	}
+
+	filter := bson.M{"_id": ObjectID}
+	_, err = notesCollection.DeleteOne(context.Background(), filter)
 
 	if err != nil {
 		return err
