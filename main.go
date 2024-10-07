@@ -23,9 +23,10 @@ type Todo struct {
 }
 
 type Note struct {
-	ID   primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Date time.Time          `json:"date"`
-	Body string             `json:"body"`
+	ID    primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Title string             `json:"title"`
+	Date  time.Time          `json:"date"`
+	Body  string             `json:"body"`
 }
 
 var collection *mongo.Collection
@@ -164,6 +165,9 @@ func createNote(c *fiber.Ctx) error {
 	if note.Body == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "note body cannot be empty"})
 	}
+
+	fmt.Println("Current note: ", note)
+	fmt.Println("Current note: ", note.Title)
 
 	insertResult, err := notesCollection.InsertOne(context.Background(), note)
 	if err != nil {

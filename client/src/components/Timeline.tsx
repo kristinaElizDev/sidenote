@@ -7,6 +7,7 @@ import TimelineItem from './timelineItem';
 
 export type Note = {
     _id: number;
+    title: string;
     body: string;
     date: Date;
 }
@@ -45,7 +46,7 @@ const Timeline = () => {
                     <img src='/go.png' alt='Go logo' width={70} height={70} />
                 </Stack>
             )}
-            <VerticalTimeline
+            <VerticalTimeline className="display-linebreak"
                 layout="1-column-left"
             >
                 {notes?.map((note) => (

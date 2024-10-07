@@ -45,11 +45,10 @@ const NoteForm = () => {
 
     return (
         <form onSubmit={createNote}>
-            <Flex gap={2}>
                 <Textarea
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    size='sm'
+                    size='lg'
                 />
                 <Button
                     mx={2}
@@ -60,7 +59,6 @@ const NoteForm = () => {
                 >
                     {isCreating ? <Spinner size={"xs"} /> : <IoMdAdd size={30} />}
                 </Button>
-            </Flex>
         </form>
     );
 };

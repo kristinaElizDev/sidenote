@@ -10,6 +10,8 @@ import {
     useDisclosure,
     Textarea,
     Spinner,
+    Input,
+    Stack,
   } from '@chakra-ui/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
@@ -23,6 +25,7 @@ const NewNoteForm = () => {
     const btnRef = useRef(null)
 
     const [newNote, setNewNote] = useState("");
+    const [newNoteTitle, setNewNoteTitle] = useState("");
     const [isPending, setIsPending] = useState(false);
     
     const queryClient = useQueryClient(); 
@@ -32,12 +35,18 @@ const NewNoteForm = () => {
         mutationFn:async(e:React.FormEvent)=> {
             e.preventDefault()
             try {
+
+                var payload = {
+                  title: newNoteTitle, 
+                  body: newNote
+                }
+
                 const res = await fetch(BASE_URL + `/notes`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ body: newNote }),
+                    body: JSON.stringify(payload),
                 })
                 const data = await res.json()
 
@@ -66,6 +75,7 @@ const NewNoteForm = () => {
         New Note
       </Button>
       <Drawer
+        size='lg'
         isOpen={isOpen}
         placement='right'
         onClose={onClose}
@@ -74,21 +84,29 @@ const NewNoteForm = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Create a new note</DrawerHeader>
+          <DrawerHeader>Create a New Note</DrawerHeader>
 
           <DrawerBody>
-            <Textarea
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                size='sm'
-            />
+            <Stack gap='3'>
+                <p>Note Title:</p>
+                <Input
+                        type='text'
+                        value={newNoteTitle}
+                        onChange={(e) => setNewNoteTitle(e.target.value)}
+                />
+                <p>Body:</p>
+                <Textarea
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    size='xs'
+                />
+              </Stack>
           </DrawerBody>
 
           <DrawerFooter>
             <Button variant='outline' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue'>Save</Button>
             <Button
                     mx={2}
                     type='submit'

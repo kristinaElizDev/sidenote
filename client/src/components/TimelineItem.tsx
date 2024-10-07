@@ -55,7 +55,7 @@ const TimelineItem = ({ note } : {note: Note }) => {
             iconStyle={{ background: 'rgb(33, 150, 243)', color: '#fff' }}
             icon={""}
         >
-        <h3 className="vertical-timeline-element-title">New Note</h3>
+        <h3 className="vertical-timeline-element-title">{note.title ? note.title : "New Note"} </h3>
         <p>
         {note.body}
         </p>
