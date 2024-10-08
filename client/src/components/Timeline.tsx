@@ -2,7 +2,7 @@ import { Flex, Spinner, Stack, Text } from '@chakra-ui/react';
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import { useQuery } from "@tanstack/react-query";
-import TimelineItem from './timelineItem';
+import TimelineItem from './TimelineItem';
 
 
 export type Note = {

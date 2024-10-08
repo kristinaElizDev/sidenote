@@ -1,5 +1,5 @@
 import { VerticalTimelineElement } from "react-vertical-timeline-component";
-import { Note } from "./timeline";
+import { Note } from "./Timeline";
 
 const TimelineItem = ({ note } : {note: Note }) => {
     // const queryClient = useQueryClient();

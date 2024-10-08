@@ -1,7 +1,6 @@
 import { Stack } from '@chakra-ui/react'
 import Navbar from './components/Navbar'
-import Timeline from './components/timeline'
-
+import Timeline from './components/Timeline'
 
 export const BASE_URL = "http://localhost:4000/api"
 function App() {
